@@ -482,9 +482,9 @@ void DrawButtons(void)
                    - dialog->lineHeight / 2;
 
    if(dialog->buttonState == DBS_OK) {
-      button.type = BUTTON_MENU_ACTIVE;
+      button.type = BUTTON_TRAY_ACTIVE;
    } else {
-      button.type = BUTTON_MENU;
+      button.type = BUTTON_TRAY;
    }
    button.text = GetOKString();
    button.x = dialog->okx;
@@ -492,9 +492,9 @@ void DrawButtons(void)
    DrawButton(&button);
 
    if(dialog->buttonState == DBS_CANCEL) {
-      button.type = BUTTON_MENU_ACTIVE;
+      button.type = BUTTON_TRAY_ACTIVE;
    } else {
-      button.type = BUTTON_MENU;
+      button.type = BUTTON_TRAY;
    }
    button.text = GetCancelString();
    button.x = dialog->cancelx;
