@@ -26,8 +26,9 @@
 #include "misc.h"
 #include "popup.h"
 
-#define BASE_ICON_OFFSET   3
-#define MENU_BORDER_SIZE   1
+#define BASE_ICON_OFFSET        3
+#define MENU_BORDER_SIZE        1
+#define BASE_SEPARATOR_OFFSET   3
 
 typedef unsigned char MenuSelectionType;
 #define MENU_NOSELECTION   0
@@ -91,6 +92,7 @@ void InitializeMenu(Menu *menu)
    int index, temp;
    int userHeight;
    int hasSubmenu;
+   int stringHeight;
    char hasIcon;
 
    menu->textOffset = 0;
@@ -102,7 +104,8 @@ void InitializeMenu(Menu *menu)
    if(userHeight < 0) {
       userHeight = 0;
    }
-   menu->itemHeight = GetStringHeight(FONT_MENU);
+   stringHeight = GetStringHeight(FONT_MENU);
+   menu->itemHeight = stringHeight;
    for(np = menu->items; np; np = np->next) {
       if(np->iconName) {
          np->icon = LoadNamedIcon(np->iconName, 1, 1);
@@ -152,7 +155,14 @@ void InitializeMenu(Menu *menu)
    for(np = menu->items; np; np = np->next) {
       menu->offsets[index++] = menu->height;
       if(np->type == MENU_ITEM_SEPARATOR) {
-         menu->height += 6;
+         menu->height += BASE_SEPARATOR_OFFSET * 2;
+         if(np->name) {
+            menu->height += stringHeight;
+            temp = GetStringWidth(FONT_MENU, np->name);
+            if(temp > menu->width) {
+               menu->width = temp;
+            }
+         }
       } else {
          menu->height += menu->itemHeight;
       }
@@ -816,16 +826,16 @@ MenuSelectionType UpdateMotion(Menu *menu,
 /** Update the menu selection. */
 void UpdateMenu(Menu *menu)
 {
-
    MenuItem *ip;
 
    /* Clear the old selection. */
    ip = GetMenuItem(menu, menu->lastIndex);
-   DrawMenuItem(menu, ip, menu->lastIndex);
-
+   if (ip && ip->type != MENU_ITEM_SEPARATOR) {
+      DrawMenuItem(menu, ip, menu->lastIndex);
+   }
    /* Highlight the new selection. */
    ip = GetMenuItem(menu, menu->currentIndex);
-   if(ip != NULL) {
+   if (ip && ip->type != MENU_ITEM_SEPARATOR) {
       DrawMenuItem(menu, ip, menu->currentIndex);
    }
 
@@ -900,19 +910,35 @@ void DrawMenuItem(Menu *menu, MenuItem *item, int index)
 
    } else {
       if(settings.menuDecorations == DECO_MOTIF) {
-         JXSetForeground(display, rootGC, colors[COLOR_MENU_DOWN]);
-         JXDrawLine(display, menu->pixmap, rootGC, 4,
-                    menu->offsets[index] + 2, menu->width - 6,
-                    menu->offsets[index] + 2);
-         JXSetForeground(display, rootGC, colors[COLOR_MENU_UP]);
-         JXDrawLine(display, menu->pixmap, rootGC, 4,
-                    menu->offsets[index] + 3, menu->width - 6,
-                    menu->offsets[index] + 3);
+         if(item->name) {
+            int w = GetStringWidth(FONT_MENU, item->name);
+            int xoffset = menu->width / 2 - w / 2;
+            RenderString(menu->pixmap, FONT_MENU, COLOR_MENU_FG,
+                        MENU_BORDER_SIZE + xoffset,
+                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
+         } else {
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_DOWN]);
+            JXDrawLine(display, menu->pixmap, rootGC, 4,
+                       menu->offsets[index] + BASE_SEPARATOR_OFFSET, menu->width - 6,
+                       menu->offsets[index] + BASE_SEPARATOR_OFFSET);
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_UP]);
+            JXDrawLine(display, menu->pixmap, rootGC, 4,
+                       menu->offsets[index] + BASE_SEPARATOR_OFFSET + 1, menu->width - 6,
+                       menu->offsets[index] + BASE_SEPARATOR_OFFSET + 1);
+         }
       } else {
-         JXSetForeground(display, rootGC, colors[COLOR_MENU_FG]);
-         JXDrawLine(display, menu->pixmap, rootGC, 4,
-                    menu->offsets[index] + 2, menu->width - 6,
-                    menu->offsets[index] + 2);
+         if(item->name) {
+            int w = GetStringWidth(FONT_MENU, item->name);
+            int xoffset = menu->width / 2 - w / 2;
+            RenderString(menu->pixmap, FONT_MENU, COLOR_MENU_FG,
+                        MENU_BORDER_SIZE + xoffset,
+                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
+         } else {
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_FG]);
+            JXDrawLine(display, menu->pixmap, rootGC, 4,
+                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, menu->width - 6,
+                        menu->offsets[index] + BASE_SEPARATOR_OFFSET);
+         }
       }
    }
 

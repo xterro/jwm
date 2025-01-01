@@ -714,6 +714,10 @@ MenuItem *ParseMenuItem(const TokenNode *start, Menu *menu, MenuItem *last)
 
          last = InsertMenuItem(last);
          last->type = MENU_ITEM_SEPARATOR;
+
+         value = FindAttribute(start->attributes, LABEL_ATTRIBUTE);
+         last->name = value ? CopyString(value) : NULL;
+
          if(!menu->items) {
             menu->items = last;
          }
