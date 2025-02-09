@@ -71,17 +71,20 @@ typedef unsigned char ColorType;
 #define COLOR_MENU_ACTIVE_FG           53
 #define COLOR_MENU_ACTIVE_UP           54
 #define COLOR_MENU_ACTIVE_DOWN         55
-#define COLOR_POPUP_BG                 56
-#define COLOR_POPUP_FG                 57
-#define COLOR_POPUP_OUTLINE            58
-#define COLOR_TITLE_UP                 59
-#define COLOR_TITLE_DOWN               60
-#define COLOR_TITLE_ACTIVE_UP          61
-#define COLOR_TITLE_ACTIVE_DOWN        62
-#define COLOR_CLOCK_FG                 63
-#define COLOR_CLOCK_BG1                64
-#define COLOR_CLOCK_BG2                65
-#define COLOR_COUNT                    66
+#define COLOR_MENU_SEPARATOR_BG        56
+#define COLOR_MENU_SEPARATOR_FG        57
+#define COLOR_MENU_SEPARATOR_OUTLINE   58
+#define COLOR_POPUP_BG                 59
+#define COLOR_POPUP_FG                 60
+#define COLOR_POPUP_OUTLINE            61
+#define COLOR_TITLE_UP                 62
+#define COLOR_TITLE_DOWN               63
+#define COLOR_TITLE_ACTIVE_UP          64
+#define COLOR_TITLE_ACTIVE_DOWN        65
+#define COLOR_CLOCK_FG                 66
+#define COLOR_CLOCK_BG1                67
+#define COLOR_CLOCK_BG2                68
+#define COLOR_COUNT                    69
 
 typedef unsigned char GradientDirection;
 #define GRADIENT_HORIZONTAL        0

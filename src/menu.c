@@ -27,7 +27,7 @@
 #include "popup.h"
 
 #define BASE_ICON_OFFSET        3
-#define MENU_BORDER_SIZE        1
+#define MENU_BORDER_SIZE        2
 #define BASE_SEPARATOR_OFFSET   3
 
 typedef unsigned char MenuSelectionType;
@@ -92,7 +92,8 @@ void InitializeMenu(Menu *menu)
    int index, temp;
    int userHeight;
    int hasSubmenu;
-   int stringHeight;
+   int separatorHeight;
+   int maxSeparatorWidth;
    char hasIcon;
 
    menu->textOffset = 0;
@@ -104,8 +105,8 @@ void InitializeMenu(Menu *menu)
    if(userHeight < 0) {
       userHeight = 0;
    }
-   stringHeight = GetStringHeight(FONT_MENU);
-   menu->itemHeight = stringHeight;
+
+   menu->itemHeight = GetStringHeight(FONT_MENU);
    for(np = menu->items; np; np = np->next) {
       if(np->iconName) {
          np->icon = LoadNamedIcon(np->iconName, 1, 1);
@@ -152,16 +153,19 @@ void InitializeMenu(Menu *menu)
 
    hasSubmenu = 0;
    index = 0;
+   maxSeparatorWidth = 0;
+   separatorHeight = 0;
    for(np = menu->items; np; np = np->next) {
       menu->offsets[index++] = menu->height;
       if(np->type == MENU_ITEM_SEPARATOR) {
          menu->height += BASE_SEPARATOR_OFFSET * 2;
          if(np->name) {
-            menu->height += stringHeight;
-            temp = GetStringWidth(FONT_MENU, np->name);
-            if(temp > menu->width) {
-               menu->width = temp;
-            }
+            separatorHeight = GetStringHeight(FONT_MENU_SEPARATOR) + 1;
+            menu->height += separatorHeight;
+            temp = GetStringWidth(FONT_MENU_SEPARATOR, np->name);
+
+            if (temp > maxSeparatorWidth)
+               maxSeparatorWidth = temp;
          }
       } else {
          menu->height += menu->itemHeight;
@@ -180,8 +184,16 @@ void InitializeMenu(Menu *menu)
          InitializeMenu(np->submenu);
       }
    }
+
    menu->width += hasSubmenu + menu->textOffset;
    menu->width += 7 + 2 * MENU_BORDER_SIZE;
+
+   /** Needs to consider the width of the separator */
+   if(maxSeparatorWidth > menu->width)
+      menu->width = maxSeparatorWidth + separatorHeight;
+   else
+      menu->width += separatorHeight;
+
    menu->height += MENU_BORDER_SIZE;
    menu->mousex = -1;
    menu->mousey = -1;
@@ -591,7 +603,7 @@ void MapMenu(Menu *menu, int x, int y, char keyboard)
                       settings.menuOpacity);
    }
 
-   JXMapRaised(display, menu->window); 
+   JXMapRaised(display, menu->window);
 
    if(keyboard && menu->itemCount != 0) {
       const int y = menu->offsets[0] + menu->itemHeight / 2;
@@ -911,9 +923,9 @@ void DrawMenuItem(Menu *menu, MenuItem *item, int index)
    } else {
       if(settings.menuDecorations == DECO_MOTIF) {
          if(item->name) {
-            int w = GetStringWidth(FONT_MENU, item->name);
-            int xoffset = menu->width / 2 - w / 2;
-            RenderString(menu->pixmap, FONT_MENU, COLOR_MENU_FG,
+            int w = GetStringWidth(FONT_MENU_SEPARATOR, item->name);
+            int xoffset = menu->width / 2 - w / 2 - 1;
+            RenderString(menu->pixmap, FONT_MENU_SEPARATOR, COLOR_MENU_SEPARATOR_FG,
                         MENU_BORDER_SIZE + xoffset,
                         menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
          } else {
@@ -928,13 +940,26 @@ void DrawMenuItem(Menu *menu, MenuItem *item, int index)
          }
       } else {
          if(item->name) {
-            int w = GetStringWidth(FONT_MENU, item->name);
-            int xoffset = menu->width / 2 - w / 2;
-            RenderString(menu->pixmap, FONT_MENU, COLOR_MENU_FG,
+
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_BG]);
+            JXFillRectangle(display, menu->pixmap, rootGC,
+                           MENU_BORDER_SIZE, menu->offsets[index],
+                           menu->width - MENU_BORDER_SIZE * 2 - 1,
+                           GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
+
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_OUTLINE]);
+            JXDrawRectangle(display, menu->pixmap, rootGC,
+                           MENU_BORDER_SIZE, menu->offsets[index],
+                           menu->width - MENU_BORDER_SIZE * 2 - 1,
+                           GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
+
+            int w = GetStringWidth(FONT_MENU_SEPARATOR, item->name);
+            int xoffset = menu->width / 2 - w / 2 - 1;
+            RenderString(menu->pixmap, FONT_MENU_SEPARATOR, COLOR_MENU_SEPARATOR_FG,
                         MENU_BORDER_SIZE + xoffset,
                         menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
          } else {
-            JXSetForeground(display, rootGC, colors[COLOR_MENU_FG]);
+            JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_FG]);
             JXDrawLine(display, menu->pixmap, rootGC, 4,
                         menu->offsets[index] + BASE_SEPARATOR_OFFSET, menu->width - 6,
                         menu->offsets[index] + BASE_SEPARATOR_OFFSET);
@@ -1077,4 +1102,3 @@ char IsMenuValid(const Menu *menu)
    }
    return 0;
 }
-

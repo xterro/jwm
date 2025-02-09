@@ -239,6 +239,7 @@ static void ParseMinimized(const TokenNode *tp, ColorType fg,
 static void ParsePagerStyle(const TokenNode *tp);
 static void ParseClockStyle(const TokenNode *tp);
 static void ParseMenuStyle(const TokenNode *tp);
+static void ParseMenuSeparatorStyle(const TokenNode *tp);
 static void ParsePopupStyle(const TokenNode *tp);
 
 /* Feel. */
@@ -381,6 +382,9 @@ void Parse(const TokenNode *start, int depth)
                break;
             case TOK_MENUSTYLE:
                ParseMenuStyle(tp);
+               break;
+            case TOK_MENUSEPARATORSTYLE:
+               ParseMenuSeparatorStyle(tp);
                break;
             case TOK_MOVEMODE:
                ParseMoveMode(tp);
@@ -1140,7 +1144,7 @@ void ParseInclude(const TokenNode *tp, int depth)
 
 /** Parse desktop configuration. */
 void ParseDesktops(const TokenNode *tp) {
-   
+
    static const StringMappingType mapping[] = {
       { "off",       DBACKANDFORTH_OFF },
       { "on",        DBACKANDFORTH_ON  }
@@ -1915,6 +1919,32 @@ void ParseMenuStyle(const TokenNode *tp)
 
 }
 
+
+/** Parse the menu separator style. */
+void ParseMenuSeparatorStyle(const TokenNode *tp)
+{
+   const TokenNode *np;
+   for(np = tp->subnodeHead; np; np = np->next) {
+      switch(np->type) {
+      case TOK_FONT:
+         SetFont(FONT_MENU_SEPARATOR, np->value);
+         break;
+      case TOK_BACKGROUND:
+         SetColor(COLOR_MENU_SEPARATOR_BG, np->value);
+         break;
+      case TOK_FOREGROUND:
+         SetColor(COLOR_MENU_SEPARATOR_FG, np->value);
+         break;
+      case TOK_OUTLINE:
+         SetColor(COLOR_MENU_SEPARATOR_OUTLINE, np->value);
+         break;
+      default:
+         InvalidTag(np, TOK_MENUSEPARATORSTYLE);
+         break;
+      }
+   }
+}
+
 /** Parse an option group. */
 void ParseGroup(const TokenNode *tp)
 {
@@ -2031,7 +2061,7 @@ void ParseGradient(const char *value, ColorType a, ColorType b)
       sep = strchr(value, ';');
       SetGradient(a, b, GRADIENT_HORIZONTAL);
    }
-   
+
    if(!sep) {
 
       /* Only one color given - use the same color for both. */

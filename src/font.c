@@ -42,10 +42,11 @@ static const struct {
    const FontType src;
    const FontType dest;
 } INHERITED_FONTS[] = {
-   { FONT_TRAY, FONT_PAGER       },
-   { FONT_TRAY, FONT_CLOCK       },
-   { FONT_TRAY, FONT_TASKLIST    },
-   { FONT_TRAY, FONT_TRAYBUTTON  }
+   { FONT_TRAY,            FONT_PAGER      },
+   { FONT_TRAY,            FONT_CLOCK      },
+   { FONT_TRAY,            FONT_TASKLIST   },
+   { FONT_TRAY,            FONT_TRAYBUTTON },
+   { FONT_MENU_SEPARATOR,  FONT_MENU       }
 };
 
 static char *GetUTF8String(const char *str);
@@ -162,7 +163,7 @@ void StartupFonts(void)
 
          pango_font_description_free(desc);
          pango_font_metrics_unref(metrics);
-        
+
       } else {
         font_ascents[x] = 0;
         font_heights[x] = 0;

@@ -59,6 +59,7 @@ static const StringMappingType TOKEN_MAP[] = {
    { "Machine",              TOK_MACHINE              },
    { "Maximize",             TOK_MAXIMIZE             },
    { "Menu",                 TOK_MENU                 },
+   { "MenuSeparatorStyle",   TOK_MENUSEPARATORSTYLE   },
    { "MenuStyle",            TOK_MENUSTYLE            },
    { "Minimize",             TOK_MINIMIZE             },
    { "Minimized",            TOK_MINIMIZED            },
@@ -108,7 +109,7 @@ static TokenNode *head;
 static TokenNode *CreateNode(TokenNode *current,
                              const char *file,
                              unsigned int line);
-static AttributeNode *CreateAttribute(TokenNode *np); 
+static AttributeNode *CreateAttribute(TokenNode *np);
 
 static char IsElementEnd(char ch);
 static char IsValueEnd(char ch);
@@ -322,7 +323,7 @@ ReadDefault:
                   }
                }
             }
-  
+
          } else {
 
             /* In tag body; read text. */

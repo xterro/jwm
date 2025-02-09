@@ -14,15 +14,16 @@
 
 /** Enumeration of different components that use fonts. */
 typedef unsigned char FontType;
-#define FONT_BORDER     0
-#define FONT_MENU       1
-#define FONT_POPUP      2
-#define FONT_TRAY       3
-#define FONT_PAGER      4
-#define FONT_CLOCK      5
-#define FONT_TASKLIST   6
-#define FONT_TRAYBUTTON 7
-#define FONT_COUNT      8
+#define FONT_BORDER         0
+#define FONT_MENU           1
+#define FONT_MENU_SEPARATOR 2
+#define FONT_POPUP          3
+#define FONT_TRAY           4
+#define FONT_PAGER          5
+#define FONT_CLOCK          6
+#define FONT_TASKLIST       7
+#define FONT_TRAYBUTTON     8
+#define FONT_COUNT          9
 
 void InitializeFonts(void);
 void StartupFonts(void);
@@ -67,4 +68,3 @@ int GetStringHeight(FontType ft);
 char *ConvertFromUTF8(char *str);
 
 #endif /* FONT_H */
-
