@@ -27,7 +27,7 @@
 #include "popup.h"
 
 #define BASE_ICON_OFFSET        3
-#define MENU_BORDER_SIZE        2
+#define MENU_BORDER_SIZE        3
 #define BASE_SEPARATOR_OFFSET   3
 
 typedef unsigned char MenuSelectionType;
@@ -921,14 +921,27 @@ void DrawMenuItem(Menu *menu, MenuItem *item, int index)
       }
 
    } else {
-      if(settings.menuDecorations == DECO_MOTIF) {
-         if(item->name) {
-            int w = GetStringWidth(FONT_MENU_SEPARATOR, item->name);
-            int xoffset = menu->width / 2 - w / 2 - 1;
-            RenderString(menu->pixmap, FONT_MENU_SEPARATOR, COLOR_MENU_SEPARATOR_FG,
-                        MENU_BORDER_SIZE + xoffset,
-                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
-         } else {
+      if(item->name) {
+         JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_BG]);
+         JXFillRectangle(display, menu->pixmap, rootGC,
+                        MENU_BORDER_SIZE - 1, menu->offsets[index],
+                        menu->width - MENU_BORDER_SIZE * 2 + 1,
+                        GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
+
+         JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_OUTLINE]);
+         JXDrawRectangle(display, menu->pixmap, rootGC,
+                        MENU_BORDER_SIZE - 1, menu->offsets[index],
+                        menu->width - MENU_BORDER_SIZE * 2 + 1,
+                        GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
+
+         int w = GetStringWidth(FONT_MENU_SEPARATOR, item->name);
+         int xoffset = menu->width / 2 - w / 2 - MENU_BORDER_SIZE;
+         RenderString(menu->pixmap, FONT_MENU_SEPARATOR, COLOR_MENU_SEPARATOR_FG,
+                     MENU_BORDER_SIZE + xoffset,
+                     menu->offsets[index] + BASE_SEPARATOR_OFFSET + 1, w, item->name);
+      }
+      else {
+         if(settings.menuDecorations == DECO_MOTIF) {
             JXSetForeground(display, rootGC, colors[COLOR_MENU_DOWN]);
             JXDrawLine(display, menu->pixmap, rootGC, 4,
                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, menu->width - 6,
@@ -937,27 +950,6 @@ void DrawMenuItem(Menu *menu, MenuItem *item, int index)
             JXDrawLine(display, menu->pixmap, rootGC, 4,
                        menu->offsets[index] + BASE_SEPARATOR_OFFSET + 1, menu->width - 6,
                        menu->offsets[index] + BASE_SEPARATOR_OFFSET + 1);
-         }
-      } else {
-         if(item->name) {
-
-            JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_BG]);
-            JXFillRectangle(display, menu->pixmap, rootGC,
-                           MENU_BORDER_SIZE, menu->offsets[index],
-                           menu->width - MENU_BORDER_SIZE * 2 - 1,
-                           GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
-
-            JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_OUTLINE]);
-            JXDrawRectangle(display, menu->pixmap, rootGC,
-                           MENU_BORDER_SIZE, menu->offsets[index],
-                           menu->width - MENU_BORDER_SIZE * 2 - 1,
-                           GetStringHeight(FONT_MENU_SEPARATOR) + BASE_SEPARATOR_OFFSET * 2);
-
-            int w = GetStringWidth(FONT_MENU_SEPARATOR, item->name);
-            int xoffset = menu->width / 2 - w / 2 - 1;
-            RenderString(menu->pixmap, FONT_MENU_SEPARATOR, COLOR_MENU_SEPARATOR_FG,
-                        MENU_BORDER_SIZE + xoffset,
-                        menu->offsets[index] + BASE_SEPARATOR_OFFSET, w, item->name);
          } else {
             JXSetForeground(display, rootGC, colors[COLOR_MENU_SEPARATOR_FG]);
             JXDrawLine(display, menu->pixmap, rootGC, 4,
